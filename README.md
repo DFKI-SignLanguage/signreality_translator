@@ -13,9 +13,9 @@ A machine with a GPU and 32 GB of RAM.
 ```
 git clone https://github.com/DFKI-SignLanguage/text-to-gloss-machine-translation.git .
 ```
-2. Go to the sub-directory named "model" and download the translation model
+2. Go to the sub-directory named "models" and download the translation model
 ```
-cd model
+cd models
 wget https://cloud-affective.dfki.de/s/SJCWfKdwfYDTTQL/download/result_fold_0_best_model.pt 
 cd ..
 ```
@@ -30,12 +30,32 @@ pip install -r requirements.txt
 venv/bin/python translator.py
 ```
 
+
+## Usage
+
+The XML-RPC server can be accessed by any compatible client. An example on how to use from a commandline can be found here:
+```
+curl -s \
+-H "Content-Type: text/xml" \
+-d '<?xml version="1.0"?>
+<methodCall>
+<methodName>translate</methodName>
+<params>
+<param>
+<value><string>Der Zug ICE 234 aus Mainz fährt um 4:40 Uhr.</string></value>
+</param>
+</params>
+</methodCall>' \
+http://localhost:8000
+```
+
+
 ## Configuration
 
 The translator script takes the parameter `--config` and allows parameters to be specified in a YAML configuration file. Two sample configuration files are provided. Example:
 
 ```
-python translator.py --config config/translator.yaml
+venv/bin/python translator.py --config config/translator.yaml
 ```
 
 The following parameters can be configured:
@@ -44,6 +64,7 @@ The following parameters can be configured:
  - __port__: the port where the server shall run
  - __rpc_path__: the rpc path that the server will respond to
  - __exposed_function__: the name of the function that will be exposed to XML_RPC
+ - 
 
 ## Credits
 
