@@ -64,9 +64,9 @@ class Translator:
         dataset = StringDataset(strings)
         test_dataloader = DataLoader(dataset, batch_size=2, shuffle=False)
         with torch.no_grad():
-            for text_tokens_padded, in test_dataloader:
-                text_tokens_padded = text_tokens_padded.to(self.device)
-                max_length = int(round(text_tokens_padded.size(1) * 1.5, 0))
+            for text_tokens_padded in test_dataloader:
+                #text_tokens_padded = text_tokens_padded.to(self.device)
+                max_length = int(round(len(text_tokens_padded) * 1.5, 0))
                 model_response = self.model.generate(input_ids=text_tokens_padded,
                                                      max_length=max_length)
                 for i in range(text_tokens_padded.size(0)):
@@ -86,15 +86,15 @@ def start_server(rpc_path, host, port, exposed_function, pretrained_model, finet
     with SimpleXMLRPCServer((host, port), requestHandler=RequestHandler) as server:
         server.register_introspection_functions()
 
-    # Initialize the Translator class
-    translator = Translator(pretrained_model, finetuned_model)
+        # Initialize the Translator class
+        translator = Translator(pretrained_model, finetuned_model)
 
-    # Register the translate function
-    server.register_function(translator.translate, exposed_function)
+        # Register the translate function
+        server.register_function(translator.translate, exposed_function)
 
-    # Run the server's main loop
-    print(f"Serving XML-RPC on {host} port {port}")
-    server.serve_forever()
+        # Run the server's main loop
+        print(f"Serving XML-RPC on {host} port {port}")
+        server.serve_forever()
 
 
 if __name__ == '__main__':
@@ -105,4 +105,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     with open(args.config, 'r') as file:
         params = yaml.safe_load(file)
-    start_server(**params)
+
+    translator = Translator(params['pretrained_model'], params['finetuned_model'])
+    print(translator.translate(["der Zug kommt", "der Bahnsteig"])) 
+    #start_server(**params)
