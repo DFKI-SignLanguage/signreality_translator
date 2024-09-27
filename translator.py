@@ -34,7 +34,6 @@ class Translator:
             abspath = os.path.dirname(os.path.abspath(__file__))
             finetuned_model_filename = os.path.join(abspath, finetuned_model_filename)
 
-        print(f"Loading fine-tuned model...")
         self.model.load_state_dict(torch.load(finetuned_model_filename))
         self.model.eval()
         print(f"Loading tokenizer...")
@@ -58,7 +57,7 @@ class Translator:
         return translated_sentence
 
 
-def start_server(rpc_path, host, port, exposed_function, pretrained_model, finetuned_model):
+def start_server(rpc_path, port, exposed_function, pretrained_model, finetuned_model):
     hostname = socket.gethostname()
     host = socket.gethostbyname(hostname)
     # Restrict to a particular path.
