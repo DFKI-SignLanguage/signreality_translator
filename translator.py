@@ -89,6 +89,4 @@ if __name__ == '__main__':
     with open(args.config, 'r') as file:
         params = yaml.safe_load(file)
 
-    translator = Translator(params['pretrained_model'], params['finetuned_model'])
-    print(translator.translate(["der Zug kommt", "der Bahnsteig"])) 
-    #start_server(**params)
+    start_server(**params)
