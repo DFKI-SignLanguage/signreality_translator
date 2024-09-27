@@ -48,7 +48,7 @@ class Translator:
         """
 
         # Tokenize the input sentence
-        inputs = self.tokenizer(sentence, return_tensors="pt", padding=True, truncation=True)
+        inputs = self.tokenizer(sentence, return_tensors="pt", padding=True, truncation=True).to(self.device)
 
         # Generate translation
         translated_tokens = self.model.generate(**inputs, forced_bos_token_id=self.tokenizer)
