@@ -11,14 +11,20 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 
 class StringDataset(Dataset):
-    def __init__(self, strings):
-        self.strings = strings
+    def __init__(self, string_list, tokenizer, max_length=512):
+        self.string_list = string_list
+        self.tokenizer = tokenizer
+        self.max_length = max_length
+        self.vocab_size = len(tokenizer)
 
     def __len__(self):
-        return len(self.strings)
+        return len(self.string_list)
 
     def __getitem__(self, idx):
-        return self.strings[idx]
+        string = self.string_list[idx]
+        text_tokens = self.tokenizer.encode(string, add_special_tokens=True)
+        text_tokens = torch.tensor(text_tokens)
+        return text_tokens
 
 
 class Translator:
@@ -61,12 +67,12 @@ class Translator:
         translation_output = []
 
         # Batch the input strings
-        dataset = StringDataset(strings)
+        dataset = StringDataset(strings, self.tokenizer)
         test_dataloader = DataLoader(dataset, batch_size=2, shuffle=False)
         with torch.no_grad():
             for text_tokens_padded in test_dataloader:
-                #text_tokens_padded = text_tokens_padded.to(self.device)
-                max_length = int(round(len(text_tokens_padded) * 1.5, 0))
+                text_tokens_padded = text_tokens_padded.to(self.device)
+                max_length = int(round(text_tokens_padded.size * 1.5, 0))
                 model_response = self.model.generate(input_ids=text_tokens_padded,
                                                      max_length=max_length)
                 for i in range(text_tokens_padded.size(0)):
