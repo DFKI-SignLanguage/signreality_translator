@@ -235,7 +235,7 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) != 2:
-        print("Usage: python nllb.py [--textTogloss|--glossTotext]")
+        print("Usage: python train.py [--textTogloss|--glossTotext]")
         sys.exit(1)
 
     if sys.argv[1] == "--textTogloss":
