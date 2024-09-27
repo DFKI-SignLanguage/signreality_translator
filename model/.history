@@ -1,0 +1,2 @@
+2024-09-27.19-52-24 lm -s /ds/videos/AVASAG/k_fold1/textTogloss/original_data/nllb/result_fold_0_best_model.pt . 
+2024-09-27.20-01-44 ln -s /ds/videos/AVASAG/k_fold1/textTogloss/original_data/nllb/result_fold_0_best_model.pt . 

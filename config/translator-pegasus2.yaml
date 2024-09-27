@@ -1,0 +1,6 @@
+pretrained_model: 'facebook/nllb-200-distilled-600M'
+finetuned_model: 'model/result_fold_0_best_model.pt'
+host: 192.168.33.115 
+port: 23476
+rpc_path: '/RPC2'
+exposed_function: 'translate'

@@ -2,6 +2,8 @@ import argparse
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 from xmlrpc.server import SimpleXMLRPCServer
 
+import os
+import socket
 import torch
 import yaml
 from torch.utils.data import Dataset, DataLoader
@@ -34,10 +36,18 @@ class Translator:
         :type fold: int
         """
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        
         print(f"Loading pretrained model...")
         self.model = AutoModelForSeq2SeqLM.from_pretrained(pretrained_model_filename).to(self.device)
-        self.model.load_state_dict(torch.load(finetuned_model_filename))
+
         print(f"Loading fine-tuned model...")
+        # make sure the path is absolute
+        if not os.path.isabs(finetuned_model_filename):
+            abspath = os.path.dirname(os.path.abspath(__file__))
+            finetuned_model_filename = os.path.join(abspath, finetuned_model_filename)
+
+        print(f"Loading fine-tuned model...")
+        self.model.load_state_dict(torch.load(finetuned_model_filename))
         self.model.eval()
         print(f"Loading tokenizer...")
         self.tokenizer = AutoTokenizer.from_pretrained(pretrained_model_filename)
@@ -66,6 +76,8 @@ class Translator:
 
 
 def start_server(rpc_path, host, port, exposed_function, pretrained_model, finetuned_model):
+    hostname = socket.gethostname()
+    host = socket.gethostbyname(hostname)
     # Restrict to a particular path.
     class RequestHandler(SimpleXMLRPCRequestHandler):
         rpc_paths = (rpc_path, )
@@ -87,8 +99,9 @@ def start_server(rpc_path, host, port, exposed_function, pretrained_model, finet
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Start text-to-gloss translator XML-RPC server with config file.')
+    path = os.path.abspath(__file__)
     parser.add_argument('--config', type=str, help='Path to the YAML config file',
-                        default='config/translator.yaml')
+                        default=os.path.join(path, 'config/translator.yaml'))
     args = parser.parse_args()
     with open(args.config, 'r') as file:
         params = yaml.safe_load(file)
