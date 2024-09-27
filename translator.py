@@ -12,23 +12,6 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import datasets
 
 
-class StringDataset(Dataset):
-    def __init__(self, string_list, tokenizer, max_length=512):
-        self.string_list = string_list
-        self.tokenizer = tokenizer
-        self.max_length = max_length
-        self.vocab_size = len(tokenizer)
-
-    def __len__(self):
-        return len(self.string_list)
-
-    def __getitem__(self, idx):
-        string = self.string_list[idx]
-        text_tokens = self.tokenizer.encode(string, add_special_tokens=True)
-        text_tokens = torch.tensor(text_tokens)
-        return text_tokens
-
-
 class Translator:
     def __init__(self, pretrained_model_filename, finetuned_model_filename):
         """
@@ -60,27 +43,22 @@ class Translator:
         print(f"Loading tokenizer...")
         self.tokenizer = AutoTokenizer.from_pretrained(pretrained_model_filename)
 
-    def translate(self, strings):
+    def translate(self, sentence):
         """
 
         :param strings:
         :return:
         """
-        translation_output = []
 
-        # Batch the input strings
-        dataset = StringDataset(strings, self.tokenizer)
-        test_dataloader = DataLoader(dataset, batch_size=1, shuffle=False, collate_fn=datasets.collate_fn)
-        with torch.no_grad():
-            for text_tokens_padded in test_dataloader:
-                text_tokens_padded = text_tokens_padded.to(self.device)
-                max_length = int(round(text_tokens_padded.size * 1.5, 0))
-                model_response = self.model.generate(input_ids=text_tokens_padded,
-                                                     max_length=max_length)
-                for i in range(text_tokens_padded.size(0)):
-                    text_predicted = self.tokenizer.decode(model_response[i], skip_special_tokens=True)
-                    translation_output.append(text_predicted)
-        return translation_output
+        # Tokenize the input sentence
+        inputs = self.tokenizer(sentence, return_tensors="pt", padding=True, truncation=True)
+
+        # Generate translation
+        translated_tokens = self.model.generate(**inputs, forced_bos_token_id=self.tokenizer)
+
+        # Decode the translated tokens
+        translated_sentence = self.tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)[0]
+        return translated_sentence
 
 
 def start_server(rpc_path, host, port, exposed_function, pretrained_model, finetuned_model):
