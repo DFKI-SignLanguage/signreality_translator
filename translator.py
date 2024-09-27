@@ -9,6 +9,8 @@ import yaml
 from torch.utils.data import Dataset, DataLoader
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
+import datasets
+
 
 class StringDataset(Dataset):
     def __init__(self, string_list, tokenizer, max_length=512):
@@ -23,13 +25,8 @@ class StringDataset(Dataset):
     def __getitem__(self, idx):
         string = self.string_list[idx]
         text_tokens = self.tokenizer.encode(string, add_special_tokens=True)
-        padding_value = self.tokenizer.pad_token_id  # here for nllb paddign token is 1
         text_tokens = torch.tensor(text_tokens)
-        text_tokens_padded = torch.nn.utils.rnn.pad_sequence(text_tokens, batch_first=True, padding_value=padding_value)
-        max_len = text_tokens_padded.size(1)
-        text_tokens_padded = torch.nn.functional.pad(text_tokens_padded, (0, max_len - text_tokens_padded.size(1)),
-                                                     value=padding_value)
-        return text_tokens_padded
+        return text_tokens
 
 
 class Translator:
@@ -73,7 +70,7 @@ class Translator:
 
         # Batch the input strings
         dataset = StringDataset(strings, self.tokenizer)
-        test_dataloader = DataLoader(dataset, batch_size=2, shuffle=False)
+        test_dataloader = DataLoader(dataset, batch_size=1, shuffle=False, collate_fn=datasets.collate_fn)
         with torch.no_grad():
             for text_tokens_padded in test_dataloader:
                 text_tokens_padded = text_tokens_padded.to(self.device)
