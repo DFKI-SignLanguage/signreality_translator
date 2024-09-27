@@ -23,8 +23,13 @@ class StringDataset(Dataset):
     def __getitem__(self, idx):
         string = self.string_list[idx]
         text_tokens = self.tokenizer.encode(string, add_special_tokens=True)
+        padding_value = self.tokenizer.pad_token_id  # here for nllb paddign token is 1
         text_tokens = torch.tensor(text_tokens)
-        return text_tokens
+        text_tokens_padded = torch.nn.utils.rnn.pad_sequence(text_tokens, batch_first=True, padding_value=padding_value)
+        max_len = text_tokens_padded.size(1)
+        text_tokens_padded = torch.nn.functional.pad(text_tokens_padded, (0, max_len - text_tokens_padded.size(1)),
+                                                     value=padding_value)
+        return text_tokens_padded
 
 
 class Translator:
