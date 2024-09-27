@@ -1,18 +1,12 @@
-import torch
-import torch.nn as nn
-import numpy as np
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-import pickle
-import os
-from sacrebleu.metrics import BLEU
-from . import datasets
-from pathlib import Path
-from sklearn.model_selection import KFold
-from torch.utils.data import Dataset, DataLoader
-import time
-from enum import Enum, verify, UNIQUE
+import argparse
+from xmlrpc.server import SimpleXMLRPCRequestHandler
+from xmlrpc.server import SimpleXMLRPCServer
 
-CHECKPOINT = 'facebook/nllb-200-distilled-600M' #for nllb
+import torch
+import yaml
+from torch.utils.data import Dataset, DataLoader
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+
 
 class StringDataset(Dataset):
     def __init__(self, strings):
@@ -26,24 +20,27 @@ class StringDataset(Dataset):
 
 
 class Translator:
-    def __init__(self, model_name, checkpoint, save_file_path, fold=1):
+    def __init__(self, pretrained_model_filename, finetuned_model_filename):
         """
         Initialize the translation engine, by loading a saved model in memory, so that it waits for
         translation requests
         :param model_name: the name of the saved model
         :type model_name: str
-        :param checkpoint: the checkpoint filename of the model to load
-        :type checkpoint: str
+        :param pretrained_model_filename: the checkpoint filename of the pre-trained model to load
+        :type pretrained_model_filename: str
         :param save_file_path: the path where models were saved
         :type save_file_path: str
         :param fold: the numerical ide of the train fold to be loaded (default=1)
         :type fold: int
         """
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model = AutoModelForSeq2SeqLM.from_pretrained(checkpoint).to(self.device)
-        self.model.load_state_dict(torch.load(save_file_path + f"_fold_{fold}_{model_name}"))
+        print(f"Loading pretrained model...")
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(pretrained_model_filename).to(self.device)
+        self.model.load_state_dict(torch.load(finetuned_model_filename))
+        print(f"Loading fine-tuned model...")
         self.model.eval()
-        self.tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+        print(f"Loading tokenizer...")
+        self.tokenizer = AutoTokenizer.from_pretrained(pretrained_model_filename)
 
     def translate(self, strings):
         """
@@ -68,27 +65,31 @@ class Translator:
         return translation_output
 
 
-def start_server(**params):
-    from xmlrpc.server import SimpleXMLRPCServer
-    from xmlrpc.server import SimpleXMLRPCRequestHandler
-
+def start_server(rpc_path, host, port, exposed_function, pretrained_model, finetuned_model):
     # Restrict to a particular path.
     class RequestHandler(SimpleXMLRPCRequestHandler):
-        rpc_paths = ('/RPC2',)
+        rpc_paths = (rpc_path, )
 
     # Create server
-    with SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler) as server:
+    with SimpleXMLRPCServer((host, port), requestHandler=RequestHandler) as server:
         server.register_introspection_functions()
 
     # Initialize the Translator class
-    translator = Translator(**params)
+    translator = Translator(pretrained_model, finetuned_model)
 
     # Register the translate function
-    server.register_function(translator.translate, 'translate')
+    server.register_function(translator.translate, exposed_function)
 
     # Run the server's main loop
-    print("Serving XML-RPC on localhost port 8000")
+    print(f"Serving XML-RPC on {host} port {port}")
     server.serve_forever()
 
+
 if __name__ == '__main__':
-    start_server()
+    parser = argparse.ArgumentParser(description='Start text-to-gloss translator XML-RPC server with config file.')
+    parser.add_argument('--config', type=str, help='Path to the YAML config file',
+                        default='config/translator.yaml')
+    args = parser.parse_args()
+    with open(args.config, 'r') as file:
+        params = yaml.safe_load(file)
+    start_server(**params)
