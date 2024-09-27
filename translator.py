@@ -51,7 +51,7 @@ class Translator:
         inputs = self.tokenizer(sentence, return_tensors="pt", padding=True, truncation=True).to(self.device)
 
         # Generate translation
-        translated_tokens = self.model.generate(**inputs, forced_bos_token_id=self.tokenizer)
+        translated_tokens = self.model.generate(**inputs, forced_bos_token_id=self.tokenizer.tokenizer.lang_code_to_id['deu_Latn'])
 
         # Decode the translated tokens
         translated_sentence = self.tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)[0]
