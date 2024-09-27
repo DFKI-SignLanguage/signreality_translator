@@ -6,10 +6,7 @@ import os
 import socket
 import torch
 import yaml
-from torch.utils.data import Dataset, DataLoader
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-
-import datasets
 
 
 class Translator:
