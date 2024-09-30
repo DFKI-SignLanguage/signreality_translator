@@ -42,13 +42,13 @@ curl -s \
 <methodName>translate</methodName>
 <params>
 <param>
-<value><string>Der Zug ICE 234 aus Mainz fährt um 4:40 Uhr.</string></value>
+<value><string>der zug ICE 234 aus mainz fährt um 4 : 40 Uhr .</string></value>
 </param>
 </params>
 </methodCall>' \
 http://localhost:8000/RPC2
 ```
-
+Please note that text needs to be lowercased.
 
 ## Configuration
 
