@@ -81,7 +81,7 @@ def start_server(rpc_path, port, exposed_function, pretrained_model, finetuned_m
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Start text-to-gloss translator XML-RPC server with config file.')
-    path = os.path.abspath(__file__)
+    path = os.path.dirname(os.path.abspath(__file__))
     parser.add_argument('--config', type=str, help='Path to the YAML config file',
                         default=os.path.join(path, 'config/translator.yaml'))
     args = parser.parse_args()
