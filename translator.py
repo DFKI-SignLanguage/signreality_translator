@@ -57,9 +57,14 @@ class Translator:
         return translated_sentence
 
 
-def start_server(rpc_path, port, exposed_function, pretrained_model, finetuned_model):
-    hostname = socket.gethostname()
-    host = socket.gethostbyname(hostname)
+def start_server(listen_all_ifaces: bool, rpc_path, port, exposed_function, pretrained_model, finetuned_model):
+
+    if listen_all_ifaces:
+        host = ""
+    else:
+        hostname = socket.gethostname()
+        host = socket.gethostbyname(hostname)
+
     # Restrict to a particular path.
     class RequestHandler(SimpleXMLRPCRequestHandler):
         rpc_paths = (rpc_path, )
@@ -79,13 +84,23 @@ def start_server(rpc_path, port, exposed_function, pretrained_model, finetuned_m
         server.serve_forever()
 
 
+#
+#
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Start text-to-gloss translator XML-RPC server with config file.')
+
     path = os.path.dirname(os.path.abspath(__file__))
+
+    parser = argparse.ArgumentParser(description='Start text-to-gloss translator XML-RPC server with config file.')
     parser.add_argument('--config', type=str, help='Path to the YAML config file',
                         default=os.path.join(path, 'config/translator.yaml'))
+    parser.add_argument('--listen-all-interfaces', action="store_true",
+                        help='If true, the server will listen on all network interfaces, otherwise only on localhost.')
+
     args = parser.parse_args()
+
+    listen_all_ifaces = args.listen_all_interfaces
+
     with open(args.config, 'r') as file:
         params = yaml.safe_load(file)
 
-    start_server(**params)
+    start_server(listen_all_ifaces, **params)
