@@ -1,5 +1,5 @@
 pretrained_model: 'facebook/nllb-200-distilled-600M'
-finetuned_model: 'model/result_fold_0_best_model.pt'
+finetuned_model: 'model/result_fold_3_best_model.pt'
 port: 8000
 rpc_path: '/RPC2'
 exposed_function: 'translate'
