@@ -22,10 +22,14 @@ nvidia-nccl-cu12==2.20.5
 nvidia-nvjitlink-cu12==12.6.68
 nvidia-nvtx-cu12==12.1.105
 packaging==24.1
+pandas==2.2.3
+python-dateutil==2.9.0.post0
+pytz==2024.2
 PyYAML==6.0.2
 regex==2024.9.11
 requests==2.32.3
 safetensors==0.4.5
+six==1.16.0
 sympy==1.13.3
 tokenizers==0.20.0
 torch==2.4.1
@@ -33,4 +37,5 @@ tqdm==4.66.5
 transformers==4.45.1
 triton==3.0.0
 typing_extensions==4.12.2
+tzdata==2024.2
 urllib3==2.2.3
