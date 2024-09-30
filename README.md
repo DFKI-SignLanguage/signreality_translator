@@ -31,9 +31,11 @@ venv/bin/python translator.py
 ```
 
 
+
 ## Usage
 
 The XML-RPC server can be accessed by any compatible client. An example on how to use from a commandline can be found here:
+
 ```
 curl -s \
 -H "Content-Type: text/xml" \
@@ -48,7 +50,13 @@ curl -s \
 </methodCall>' \
 http://localhost:8000/RPC2
 ```
-Please note that text needs to be lowercased.
+
+Please not that the text needs to be lowercased. 
+
+Alternatively, you can try directly from within Python code with the provided example:
+
+    python InvokeTranslator.py
+
 
 ## Configuration
 
@@ -64,7 +72,9 @@ The following parameters can be configured:
  - __port__: the port where the server shall run
  - __rpc_path__: the rpc path that the server will respond to
  - __exposed_function__: the name of the function that will be exposed to XML_RPC
- - 
+
+There is also the commandline option `--listen-all-interfaces`.  If true, theserver will listen on all network interfaces, otherwise only on localhost.
+
 
 ## Credits
 
