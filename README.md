@@ -34,6 +34,7 @@ venv/bin/python translator.py
 ## Usage
 
 The XML-RPC server can be accessed by any compatible client. An example on how to use from a commandline can be found here:
+
 ```
 curl -s \
 -H "Content-Type: text/xml" \
@@ -48,6 +49,10 @@ curl -s \
 </methodCall>' \
 http://localhost:8000/RPC2
 ```
+
+Alternatively, you can try directly from within Python code with the provided example:
+
+    python InvokeTranslator.py
 
 
 ## Configuration

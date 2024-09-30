@@ -23,6 +23,7 @@ class Translator:
         :param fold: the numerical ide of the train fold to be loaded (default=1)
         :type fold: int
         """
+
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         
         print(f"Loading pretrained model...")
@@ -76,7 +77,7 @@ def start_server(listen_all_ifaces: bool, rpc_path, port, exposed_function, pret
         # Initialize the Translator class
         translator = Translator(pretrained_model, finetuned_model)
 
-        # Register the translate function
+        # Register the `translate` function
         server.register_function(translator.translate, exposed_function)
 
         # Run the server's main loop
