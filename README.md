@@ -55,7 +55,7 @@ Please not that the text needs to be lowercased.
 
 Alternatively, you can try directly from within Python code with the provided example:
 
-    python InvokeTranslator.py
+    python translator_client.py
 
 
 ## Configuration
