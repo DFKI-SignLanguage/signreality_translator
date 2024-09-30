@@ -75,7 +75,7 @@ def start_server(rpc_path, port, exposed_function, pretrained_model, finetuned_m
         server.register_function(translator.translate, exposed_function)
 
         # Run the server's main loop
-        print(f"Serving XML-RPC on {host} port {port}")
+        print(f"Serving XML-RPC on http://{host}:{port}/{rpc_path}")
         server.serve_forever()
 
 
