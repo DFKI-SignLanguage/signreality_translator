@@ -16,7 +16,7 @@ git clone https://github.com/DFKI-SignLanguage/text-to-gloss-machine-translation
 2. Go to the sub-directory named "models" and download the translation model
 ```
 cd models
-wget https://cloud-affective.dfki.de/s/SJCWfKdwfYDTTQL/download/result_fold_0_best_model.pt 
+wget https://cloud-affective.dfki.de/s/4XAH22BD6ttjTD9/download/result_fold_3_best_model.pt 
 cd ..
 ```
 3. Create a virtual machine and install the requirements
