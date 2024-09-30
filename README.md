@@ -46,7 +46,7 @@ curl -s \
 </param>
 </params>
 </methodCall>' \
-http://localhost:8000
+http://localhost:8000/RPC2
 ```
 
 
