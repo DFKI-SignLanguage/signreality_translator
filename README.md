@@ -16,7 +16,7 @@ git clone https://github.com/DFKI-SignLanguage/text-to-gloss-machine-translation
 2. Go to the sub-directory named "models" and download the translation model
 ```
 cd models
-wget https://cloud-affective.dfki.de/s/SJCWfKdwfYDTTQL/download/result_fold_0_best_model.pt 
+wget https://cloud-affective.dfki.de/s/4XAH22BD6ttjTD9/download/result_fold_3_best_model.pt 
 cd ..
 ```
 3. Create a virtual machine and install the requirements
@@ -31,6 +31,7 @@ venv/bin/python translator.py
 ```
 
 
+
 ## Usage
 
 The XML-RPC server can be accessed by any compatible client. An example on how to use from a commandline can be found here:
@@ -43,16 +44,18 @@ curl -s \
 <methodName>translate</methodName>
 <params>
 <param>
-<value><string>Der Zug ICE 234 aus Mainz fährt um 4:40 Uhr.</string></value>
+<value><string>der zug ICE 234 aus mainz fährt um 4 : 40 Uhr .</string></value>
 </param>
 </params>
 </methodCall>' \
 http://localhost:8000/RPC2
 ```
 
+Please not that the text needs to be lowercased. 
+
 Alternatively, you can try directly from within Python code with the provided example:
 
-    python InvokeTranslator.py
+    python translator_client.py
 
 
 ## Configuration
@@ -69,7 +72,9 @@ The following parameters can be configured:
  - __port__: the port where the server shall run
  - __rpc_path__: the rpc path that the server will respond to
  - __exposed_function__: the name of the function that will be exposed to XML_RPC
- - 
+
+There is also the commandline option `--listen-all-interfaces`.  If true, theserver will listen on all network interfaces, otherwise only on localhost.
+
 
 ## Credits
 
